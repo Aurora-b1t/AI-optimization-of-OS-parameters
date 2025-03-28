@@ -1,2 +1,2 @@
-# AI-optimization-of-operating-system-parameters
+# 基于常见机器学习算法实现系统参数的AI调优
 全国大学生计算机系统能力大赛OS功能挑战赛道proj288
