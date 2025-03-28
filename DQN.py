@@ -35,7 +35,7 @@ class Net(nn.Module):
 
 class DQN(object):
     def __init__(self):
-        # 创建评估网络和目标网络
+        """创建评估网络和目标网络"""
         self.eval_net, self.target_net = Net().to(device), Net().to(device)
         self.learn_step_counter = 0  # 学习步数记录
         self.memory_counter = 0  # 记忆量计数
