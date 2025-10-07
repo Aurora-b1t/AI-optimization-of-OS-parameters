@@ -45,7 +45,7 @@ def main():
     cfg_env = EnvConfig(
         num_pages=N,
         capacity=capacity,
-        horizon=2000,
+        horizon=20000,
         reward_hit=1.0,
         reward_miss=0.0,
         seed=42,
@@ -62,7 +62,7 @@ def main():
     # ========= DQN config =========
     cfg_dqn = DQNConfig(
         input_dim=N,
-        hidden_dims=[256, 256],
+        hidden_dims=[128, 128],
         lr=1e-3,
         gamma=0.99,
         batch_size=128,
@@ -71,16 +71,16 @@ def main():
         min_replay_size=2000,
         eps_start=1.0,
         eps_end=0.05,
-        eps_decay_steps=100_000,
+        eps_decay_steps=50_000,
         device="cuda" if torch.cuda.is_available() else "cpu",
         grad_clip_norm=5.0,
     )
     agent = DQNAgent(cfg_dqn)
 
     # ========= Training hyperparams =========
-    episodes = 200
+    episodes = 15
     max_steps_per_episode = cfg_env.horizon
-    print_interval = 5
+    print_interval = 1
 
     global_step = 0
     t0 = time.time()
