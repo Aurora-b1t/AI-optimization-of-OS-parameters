@@ -2,11 +2,7 @@
 """
 Train a simple DQN on the VectorPageCacheEnv.
 
-Usage:
-  python run.py
-
 Notes:
-- This script expects page_cache_vector_env.py (the environment you created earlier) to be in the same directory.
 - The DQN outputs an N-dim vector of Q-values. We use it both as the env action vector and as the discrete
   action set by picking m = argmax over not-in-memory pages (epsilon-greedy).
 """
