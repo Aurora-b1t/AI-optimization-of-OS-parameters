@@ -51,9 +51,9 @@ def main():
         seed=42,
         generator=GeneratorConfig(
             num_pages=N,
-            p_repeat=0.55,
-            p_local=0.35,
-            local_window=2,
+            p_repeat=0.5,
+            p_local=0.2,
+            local_window=3,
             seed=123
         )
     )

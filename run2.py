@@ -1,5 +1,7 @@
-# python
 from collections import deque
+from collections import defaultdict, OrderedDict
+from typing import List, Tuple, Dict
+from page_cache_vector_env import GeneratorConfig, PageRequestGenerator
 
 class FIFOCache:
     def __init__(self, capacity: int):
@@ -20,9 +22,6 @@ class FIFOCache:
         self.set.add(page)
         return False
 
-# python
-from collections import OrderedDict
-
 class LRUCache:
     def __init__(self, capacity: int):
         assert capacity > 0
@@ -40,9 +39,6 @@ class LRUCache:
             self.od.popitem(last=False)
         self.od[page] = None
         return False
-
-# python
-from collections import defaultdict, OrderedDict
 
 class LFUCache:
     def __init__(self, capacity: int):
@@ -86,10 +82,6 @@ class LFUCache:
         self.min_freq = 1
         return False
 
-# python
-from typing import List, Tuple, Dict
-from page_cache_vector_env import GeneratorConfig, PageRequestGenerator
-
 def gen_requests(cfg: GeneratorConfig, length: int, init_page: int = 0) -> List[int]:
     gen = PageRequestGenerator(cfg)
     gen.reset(init_page=init_page)
@@ -114,9 +106,9 @@ def main():
     req_len = 2000
     gen_cfg = GeneratorConfig(
         num_pages=N,
-        p_repeat=0.55,
-        p_local=0.35,
-        local_window=2,
+        p_repeat=0.2,
+        p_local=0.5,
+        local_window=3,
         seed=123,   # 固定种子以复现实验
     )
 
