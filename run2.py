@@ -106,8 +106,8 @@ def main():
     req_len = 2000
     gen_cfg = GeneratorConfig(
         num_pages=N,
-        p_repeat=0.2,
-        p_local=0.5,
+        p_repeat=0.5,
+        p_local=0.2,
         local_window=3,
         seed=123,   # 固定种子以复现实验
     )

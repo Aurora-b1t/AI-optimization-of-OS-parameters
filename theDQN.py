@@ -82,7 +82,7 @@ class ReplayBuffer:
 class DQNConfig:
     input_dim: int
     hidden_dims: List[int]
-    lr: float = 1e-3
+    lr: float = 0.001
     gamma: float = 0.99
     batch_size: int = 64
     target_update_interval: int = 1000  # steps

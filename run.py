@@ -47,7 +47,7 @@ def main():
         seed=42,
         generator=GeneratorConfig(
             num_pages=N,
-            p_repeat=0.5,
+            p_repeat=0.7,
             p_local=0.2,
             local_window=3,
             seed=123
@@ -59,7 +59,7 @@ def main():
     cfg_dqn = DQNConfig(
         input_dim=N,
         hidden_dims=[128, 128],
-        lr=1e-3,
+        lr=0.001,
         gamma=0.99,
         batch_size=128,
         target_update_interval=1000,
@@ -67,7 +67,7 @@ def main():
         min_replay_size=2000,
         eps_start=1.0,
         eps_end=0.05,
-        eps_decay_steps=50_000,
+        eps_decay_steps=100_000,
         device="cuda" if torch.cuda.is_available() else "cpu",
         grad_clip_norm=5.0,
     )
