@@ -1,22 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-A very simple DQN for the VectorPageCacheEnv.
-
-Design notes:
-- Network takes an N-dim state vector (float32) and outputs N Q-values, one per page.
-- We treat the discrete action as "which page m to try to load".
-- The environment expects an action vector of length N. We use the Q-vector itself as the action
-  vector, but we force the chosen m to be the largest value to guarantee the env picks the same m.
-- Eviction j is selected by the env as the argmin over in-memory indices from the action vector.
-  The network will implicitly learn to assign lower scores to pages it prefers to evict.
-
-Training:
-- Standard DQN with target network and epsilon-greedy over allowed actions (pages not in memory).
-- We mask invalid next actions (pages already in memory at s') when computing max_a' Q(s', a').
-- Replay stores (s, a_idx, action_vec, r, s', done, next_not_mem_mask). The action_vec is kept
-  to match your earlier requirement that a is an N-d vector; the DQN loss uses a_idx.
-"""
-
 from dataclasses import dataclass
 from typing import List, Tuple, Optional, Deque
 from collections import deque
@@ -37,7 +18,6 @@ class DQNNet(nn.Module):
         layers.append(nn.Linear(dims[-1], output_dim))
         self.net = nn.Sequential(*layers)
 
-        # Kaiming init
         for m in self.modules():
             if isinstance(m, nn.Linear):
                 nn.init.kaiming_uniform_(m.weight, a=np.sqrt(5))
@@ -47,7 +27,6 @@ class DQNNet(nn.Module):
                     nn.init.uniform_(m.bias, -bound, bound)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # x: [B, N] -> q: [B, N]
         return self.net(x)
 
 
@@ -119,13 +98,6 @@ class DQNAgent:
             self.eps = self.cfg.eps_end
 
     def select_action(self, state_vec: np.ndarray, not_mem_indices: List[int]) -> Tuple[int, np.ndarray, np.ndarray]:
-        """
-        Epsilon-greedy over 'not in memory' pages.
-        Returns:
-          - m_idx: chosen page to load
-          - action_vec: (N,) vector to pass to env (float32)
-          - q_values: raw network outputs (N,)
-        """
         self.update_epsilon()
 
         s_t = torch.from_numpy(state_vec).float().unsqueeze(0).to(self.cfg.device)  # [1, N]
@@ -134,7 +106,6 @@ class DQNAgent:
         q_np = q.detach().cpu().numpy().astype(np.float32)
 
         if len(not_mem_indices) == 0:
-            # Should not happen since capacity < N, but fallback to argmax over all
             m_idx = int(np.argmax(q_np))
         else:
             if np.random.rand() < self.eps:
@@ -143,7 +114,6 @@ class DQNAgent:
                 mask_vals = q_np[not_mem_indices]
                 m_idx = int(not_mem_indices[int(np.argmax(mask_vals))])
 
-        # Build action vector for env: ensure chosen m has the max value among candidates
         action_vec = q_np.copy()
         action_vec[m_idx] = float(np.max(q_np) + 1.0)
 
@@ -163,13 +133,11 @@ class DQNAgent:
         dones = torch.tensor([float(t.done) for t in batch], dtype=torch.float32, device=device).unsqueeze(1)  # [B,1]
         next_not_mem_masks = torch.from_numpy(
             np.stack([t.next_not_mem_mask for t in batch], axis=0)
-        ).float().to(device)  # [B, N], 1.0 for valid next actions
+        ).float().to(device)
 
-        # Q(s,a)
         q_values = self.policy_net(states)                                # [B, N]
         q_sa = q_values.gather(1, actions)                                 # [B, 1]
 
-        # Target: r + gamma * max_{a' in next_not_mem} Q_target(s', a')
         with torch.no_grad():
             q_next_target = self.target_net(next_states)  # [B, N]
             # mask invalid actions by adding a large negative number

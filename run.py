@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Train a simple DQN on the VectorPageCacheEnv.
-
-Notes:
-- The DQN outputs an N-dim vector of Q-values. We use it both as the env action vector and as the discrete
-  action set by picking m = argmax over not-in-memory pages (epsilon-greedy).
-"""
-
 import time
 from typing import List, Set
 import numpy as np
@@ -17,9 +8,6 @@ from page_cache_vector_env import VectorPageCacheEnv, EnvConfig, GeneratorConfig
 
 
 def mem_from_state_first_step(s: np.ndarray) -> Set[int]:
-    """
-    For t=0 only: reset() guarantees last_req is in memory, so s>=0.5 means in-memory.
-    """
     return set(np.where(s >= 0.5)[0].tolist())
 
 
@@ -35,7 +23,6 @@ def build_next_not_mem_mask(N: int, memory_list_sorted: List[int]) -> np.ndarray
 
 
 def main():
-    # ========= Environment config =========
     N = 20
     capacity = 5
     cfg_env = EnvConfig(
@@ -55,7 +42,6 @@ def main():
     )
     env = VectorPageCacheEnv(cfg_env)
 
-    # ========= DQN config =========
     cfg_dqn = DQNConfig(
         input_dim=N,
         hidden_dims=[128, 128],
@@ -73,7 +59,6 @@ def main():
     )
     agent = DQNAgent(cfg_dqn)
 
-    # ========= Training hyperparams =========
     episodes = 15
     max_steps_per_episode = cfg_env.horizon
     print_interval = 1
@@ -139,7 +124,6 @@ def main():
                   f"hit_rate={hit_rate:.3f} eps={agent.eps:.3f} avg_loss={avg_loss:.5f} "
                   f"time={elapsed:.1f}s")
 
-    # Simple evaluation (greedy)
     eval_episodes = 5
     print("\n=== Evaluation (greedy) ===")
     saved_eps = agent.eps
